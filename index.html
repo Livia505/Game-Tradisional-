@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="id" id="html-root" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Tradisional Nusantara - Edukasi Budaya Indonesia</title>
+    <!-- Tailwind CSS untuk Desain Modern -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome untuk Ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .bg-batik-dark {
+            background-color: #1e1b4b;
+            background-image: radial-gradient(#4338ca 0.75px, transparent 0.75px), radial-gradient(#4338ca 0.75px, #1e1b4b 0.75px);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+        }
+        .bg-batik-light {
+            background-color: #f8fafc;
+            background-image: radial-gradient(#cbd5e1 0.75px, transparent 0.75px), radial-gradient(#cbd5e1 0.75px, #f8fafc 0.75px);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+        }
+    </style>
+</head>
+<body id="body-theme" class="bg-batik-dark min-h-screen text-slate-100 flex flex-col justify-between transition-colors duration-300">
+
+    <!-- ELEMEN AUDIO UNTUK BGM -->
+    <audio id="bgm-audio" loop preload="auto">
+        <source src="Lagupermainan.mp3" type="audio/mpeg">
+        Browser Anda tidak mendukung elemen audio.
+    </audio>
+
+    <!-- MODAL INPUT NAMA & OPTION MASUK ADMIN -->
+    <div id="start-modal" class="fixed inset-0 z-50 bg-indigo-950 flex flex-col items-center justify-center p-6 transition-opacity duration-500">
+        <div class="bg-slate-900/95 border border-indigo-900 p-8 rounded-3xl shadow-2xl text-center space-y-5 max-w-sm w-full">
+            <div class="w-20 h-20 bg-gradient-to-tr from-amber-500 to-yellow-300 text-slate-950 rounded-2xl flex items-center justify-center mx-auto text-3xl font-black shadow-lg animate-bounce">
+                <i class="fa-solid fa-earth-asia"></i>
+            </div>
+            <div class="space-y-1">
+                <h1 class="text-xl font-extrabold text-amber-400">Game Tradisional Nusantara</h1>
+                <p class="text-xs font-semibold text-indigo-300 bg-indigo-950/60 py-1 px-3 rounded-full border border-indigo-800/50 inline-block">
+                    Dibuat oleh: <span class="text-amber-300">Fifi XII RPL 1</span>
+                </p>
+            </div>
+
+            <!-- FORM INPUT NAMA PENGGUNA (WAJIB) -->
+            <div class="pt-2 text-left space-y-2">
+                <label for="initial-player-name" class="text-xs font-bold text-amber-300 flex items-center">
+                    <i class="fa-solid fa-user mr-1.5"></i> Masukkan Nama Pemain <span class="text-rose-500 ml-1">*Wajib</span>
+                </label>
+                <input type="text" id="initial-player-name" placeholder="Ketik nama kamu di sini..." maxlength="15" class="w-full bg-slate-950 border border-indigo-800 rounded-xl px-4 py-2.5 text-sm text-center text-amber-300 focus:outline-none focus:border-amber-400 font-semibold shadow-inner">
+                
+                <p id="name-error-msg" class="hidden text-[11px] text-rose-400 font-semibold text-center pt-1">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Harap masukkan nama pengguna sebelum memulai!
+                </p>
+
+                <button onclick="saveNameAndStart()" class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-extrabold py-2.5 px-4 rounded-xl text-sm transition shadow-lg transform active:scale-95 flex items-center justify-center space-x-2 mt-2">
+                    <span>Mulai Permainan</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+
+                <div class="pt-3 border-t border-indigo-900/60 text-center">
+                    <button onclick="openAdminLoginModal()" class="text-xs text-indigo-400 hover:text-amber-300 transition underline font-medium">
+                        <i class="fa-solid fa-user-shield mr-1"></i> Masuk sebagai Admin
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL LOGIN ADMIN -->
+    <div id="admin-login-modal" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-amber-500/50 p-6 rounded-3xl max-w-xs w-full text-center space-y-4 shadow-2xl">
+            <div class="w-12 h-12 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center mx-auto text-xl border border-amber-500/40">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <h3 class="text-base font-bold text-amber-300">Login Administrator</h3>
+            <p class="text-xs text-slate-400">Masukkan kata sandi admin</p>
+            
+            <!-- Input Password + Tombol Ikon Mata -->
+            <div class="relative w-full">
+                <input type="password" id="admin-password-input" placeholder="Password Admin" class="w-full bg-slate-950 border border-indigo-800 rounded-xl pl-4 pr-10 py-2.5 text-sm text-amber-300 focus:outline-none focus:border-amber-400 font-semibold text-center">
+                <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-amber-300 transition focus:outline-none">
+                    <i id="eye-icon" class="fa-solid fa-eye"></i>
+                </button>
+            </div>
+            
+            <p id="admin-login-err" class="hidden text-[11px] text-rose-400 font-semibold">Kata sandi salah!</p>
+            <div class="flex space-x-2 pt-2">
+                <button onclick="closeAdminLoginModal()" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2 rounded-xl text-xs transition">Batal</button>
+                <button onclick="verifyAdminPassword()" class="w-1/2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2 rounded-xl text-xs transition">Login</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header / Navbar -->
+    <header class="bg-slate-900/80 dark:bg-slate-900/80 bg-white/80 backdrop-blur border-b border-indigo-900/40 py-4 px-6 sticky top-0 z-40 transition-colors">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="returnToMenu()">
+                <div class="bg-gradient-to-tr from-amber-500 to-yellow-300 text-slate-950 p-2 rounded-xl font-extrabold shadow-lg">
+                    <i class="fa-solid fa-earth-asia text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-wide text-amber-400">Game Tradisional</h1>
+                    <p class="text-xs text-slate-400">Fifi XII RPL 1</p>
+                </div>
+            </div>
+
+            <!-- Kontrol Audio, Tema, Profil, & Tombol Admin -->
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <div id="player-display" class="hidden bg-indigo-950/80 border border-indigo-800/80 text-amber-300 px-3 py-1.5 rounded-full text-xs font-bold flex items-center space-x-1.5">
+                    <i class="fa-solid fa-user text-amber-400"></i>
+                    <span id="current-player-name">Pemain</span>
+                </div>
+                
+                <button onclick="toggleBGM()" id="bgm-btn" title="Musik BGM" class="bg-slate-800 hover:bg-slate-700 text-amber-400 px-3 py-1.5 rounded-full text-xs font-bold border border-indigo-800 transition flex items-center space-x-1">
+                    <i id="bgm-icon" class="fa-solid fa-music"></i> 
+                    <span id="bgm-status">BGM: OFF</span>
+                </button>
+
+                <button onclick="toggleTheme()" title="Ganti Tema" class="bg-slate-800 hover:bg-slate-700 text-amber-400 px-3 py-1.5 rounded-full text-xs font-bold border border-indigo-800 transition">
+                    <i id="theme-icon" class="fa-solid fa-moon"></i>
+                </button>
+
+                <button onclick="openAdminLoginModal()" title="Dashboard Admin" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 px-3 py-1.5 rounded-full text-xs font-bold border border-amber-500/40 transition flex items-center space-x-1">
+                    <i class="fa-solid fa-user-shield"></i>
+                    <span class="hidden sm:inline">Admin</span>
+                </button>
+            </div>
+        </div>
+        <div id="game-stats" class="hidden max-w-4xl mx-auto mt-3 flex items-center justify-center space-x-4 bg-indigo-950/80 border border-indigo-700/50 px-4 py-1.5 rounded-full text-xs sm:text-sm w-fit mx-auto">
+            <div id="stat-lives-wrapper"><i class="fa-solid fa-heart text-rose-500 mr-1"></i> <span id="stat-lives">3</span></div>
+            <div class="border-l border-indigo-700 pl-3"><i class="fa-solid fa-star text-amber-400 mr-1"></i> <span id="stat-score">0</span></div>
+            <div class="border-l border-indigo-700 pl-3"><i class="fa-solid fa-clock text-cyan-400 mr-1"></i> <span id="stat-timer">15</span>s</div>
+        </div>
+    </header>
+
+    <!-- Konten Utama -->
+    <main class="flex-grow max-w-4xl w-full mx-auto p-4 sm:p-6 flex items-center justify-center">
+        
+        <!-- MENU UTAMA -->
+        <div id="menu-screen" class="w-full text-center space-y-8 my-6">
+            <div class="space-y-3">
+                <span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider">
+                    Jelajah Budaya Nusantara & Sambas
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-orange-300 to-amber-400">
+                    Mari Kenali Kekayaan Indonesia!
+                </h2>
+                <p class="text-slate-300 dark:text-slate-300 text-slate-700 text-sm sm:text-base max-w-xl mx-auto">
+                    Selamat datang, <span id="welcome-player-name" class="font-bold text-amber-300">Pemain</span>! Pilih kategori kuis atau mainkan game spesial **Mencocokkan Kartu Budaya Sambas (16 Kartu)**!
+                </p>
+            </div>
+
+            <!-- Grid Pilihan Game -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-left">
+                <!-- Spesial Sambas -->
+                <button onclick="startSambasCardGame()" class="group bg-gradient-to-br from-amber-900/80 to-slate-900 hover:from-amber-900 hover:to-slate-900 border border-amber-500/60 p-4 rounded-2xl transition shadow-xl flex items-center space-x-3 sm:col-span-2 lg:col-span-3">
+                    <div class="bg-gradient-to-br from-amber-500 to-yellow-600 text-slate-950 p-3.5 rounded-xl text-xl shadow group-hover:scale-110 transition font-black">
+                        <i class="fa-solid fa-clone"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm text-amber-300">🃏 Kartu Budaya Sambas (16 Kartu / 8 Pasang)</h3>
+                        <p class="text-[11px] text-amber-200/80">Uji daya ingatmu mencocokkan aneka ragam ikon budaya khas Kabupaten Sambas!</p>
+                    </div>
+                </button>
+
+                <!-- Kategori Lain -->
+                <button onclick="startCategory(1)" class="group bg-slate-900/80 hover:bg-slate-900 border border-indigo-900 hover:border-amber-500/60 p-4 rounded-2xl transition shadow-xl flex items-center space-x-3">
+                    <div class="bg-gradient-to-br from-indigo-500 to-indigo-700 text-white p-3 rounded-xl text-lg shadow group-hover:scale-110 transition"><i class="fa-solid fa-guitar"></i></div>
+                    <div><h3 class="font-bold text-sm text-amber-300">Alat Musik</h3><p class="text-[11px] text-slate-400">Tebak alat musik.</p></div>
+                </button>
+                <button onclick="startCategory(2)" class="group bg-slate-900/80 hover:bg-slate-900 border border-indigo-900 hover:border-amber-500/60 p-4 rounded-2xl transition shadow-xl flex items-center space-x-3">
+                    <div class="bg-gradient-to-br from-rose-500 to-pink-700 text-white p-3 rounded-xl text-lg shadow group-hover:scale-110 transition"><i class="fa-solid fa-shirt"></i></div>
+                    <div><h3 class="font-bold text-sm text-amber-300">Baju Adat & Suku</h3><p class="text-[11px] text-slate-400">Pakaian Nusantara.</p></div>
+                </button>
+                <button onclick="startCategory(3)" class="group bg-slate-900/80 hover:bg-slate-900 border border-indigo-900 hover:border-amber-500/60 p-4 rounded-2xl transition shadow-xl flex items-center space-x-3">
+                    <div class="bg-gradient-to-br from-emerald-500 to-teal-700 text-white p-3 rounded-xl text-lg shadow group-hover:scale-110 transition"><i class="fa-solid fa-music"></i></div>
+                    <div><h3 class="font-bold text-sm text-amber-300">Lagu Daerah</h3><p class="text-[11px] text-slate-400">Tebak asal tembang.</p></div>
+                </button>
+                <button onclick="startCategory(4)" class="group bg-slate-900/80 hover:bg-slate-900 border border-indigo-900 hover:border-amber-500/60 p-4 rounded-2xl transition shadow-xl flex items-center space-x-3">
+                    <div class="bg-gradient-to-br from-amber-500 to-yellow-600 text-white p-3 rounded-xl text-lg shadow group-hover:scale-110 transition"><i class="fa-solid fa-house"></i></div>
+                    <div><h3 class="font-bold text-sm text-amber-300">Rumah & Senjata</h3><p class="text-[11px] text-slate-400">Arsitektur adat.</p></div>
+                </button>
+                <button onclick="startCategory(5)" class="group bg-slate-900/80 hover:bg-slate-900 border border-indigo-900 hover:border-amber-500/60 p-4 rounded-2xl transition shadow-xl flex items-center space-x-3">
+                    <div class="bg-gradient-to-br from-purple-500 to-indigo-700 text-white p-3 rounded-xl text-lg shadow group-hover:scale-110 transition"><i class="fa-solid fa-person-dancing"></i></div>
+                    <div><h3 class="font-bold text-sm text-amber-300">Tarian Daerah</h3><p class="text-[11px] text-slate-400">Tari tradisional.</p></div>
+                </button>
+                <button onclick="startCategory(6)" class="group bg-slate-900/80 hover:bg-slate-900 border border-indigo-900 hover:border-amber-500/60 p-4 rounded-2xl transition shadow-xl flex items-center space-x-3">
+                    <div class="bg-gradient-to-br from-orange-500 to-red-700 text-white p-3 rounded-xl text-lg shadow group-hover:scale-110 transition"><i class="fa-solid fa-utensils"></i></div>
+                    <div><h3 class="font-bold text-sm text-amber-300">Kuliner Khas</h3><p class="text-[11px] text-slate-400">Makanan tradisional.</p></div>
+                </button>
+            </div>
+
+            <!-- Tombol Mode Kecepatan & Campuran -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                <button onclick="startCategory(7)" class="w-full bg-indigo-900/80 hover:bg-indigo-900 text-amber-300 font-bold py-3 px-4 rounded-2xl text-xs transition shadow-lg flex items-center justify-center space-x-2 border border-indigo-700">
+                    <i class="fa-solid fa-shuffle"></i><span>Kuis Campuran Nusantara</span>
+                </button>
+                <button onclick="startSpeedRun()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3 px-4 rounded-2xl text-xs transition shadow-lg flex items-center justify-center space-x-2 border border-purple-400/40">
+                    <i class="fa-solid fa-bolt text-amber-300"></i><span>Speed Run (Tantangan 60s)</span>
+                </button>
+            </div>
+
+            <!-- Tombol Tambahan Menu -->
+            <div class="flex flex-wrap justify-center gap-2 pt-2">
+                <button onclick="openEncyclopedia()" class="bg-slate-900/80 hover:bg-slate-900 border border-indigo-800 text-amber-300 font-semibold py-2 px-4 rounded-xl text-xs transition shadow flex items-center space-x-2">
+                    <i class="fa-solid fa-book-open"></i><span>Ensiklopedia & Riwayat Pribadi</span>
+                </button>
+                <button onclick="openLeaderboard()" class="bg-slate-900/80 hover:bg-slate-900 border border-indigo-800 text-amber-300 font-semibold py-2 px-4 rounded-xl text-xs transition shadow flex items-center space-x-2">
+                    <i class="fa-solid fa-medal"></i><span>Leaderboard</span>
+                </button>
+                <button onclick="openAchievements()" class="bg-slate-900/80 hover:bg-slate-900 border border-indigo-800 text-amber-300 font-semibold py-2 px-4 rounded-xl text-xs transition shadow flex items-center space-x-2">
+                    <i class="fa-solid fa-trophy"></i><span>Pencapaian</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- LAYAR DASHBOARD ADMIN -->
+        <div id="admin-dashboard-screen" class="hidden w-full bg-slate-900/95 border border-amber-500/50 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+            <div class="flex justify-between items-center border-b border-indigo-900 pb-4">
+                <div>
+                    <h3 class="text-xl font-black text-amber-300 flex items-center">
+                        <i class="fa-solid fa-user-shield mr-2"></i> Dashboard Administrator
+                    </h3>
+                    <p class="text-xs text-slate-400">Kelola & pantau semua pemain dan skor tertinggi</p>
+                </div>
+                <button onclick="returnToMenu()" class="text-slate-400 hover:text-white text-sm">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Stats Ringkas Admin -->
+            <div class="grid grid-cols-2 gap-3 text-center">
+                <div class="bg-slate-950/80 border border-indigo-900 p-3 rounded-2xl">
+                    <p class="text-xs text-slate-400">Total Sesi Bermain</p>
+                    <p id="admin-total-players" class="text-2xl font-black text-amber-400">0</p>
+                </div>
+                <div class="bg-slate-950/80 border border-indigo-900 p-3 rounded-2xl">
+                    <p class="text-xs text-slate-400">Skor Tertinggi Game</p>
+                    <p id="admin-top-score" class="text-2xl font-black text-emerald-400">0</p>
+                </div>
+            </div>
+
+            <!-- Tabel Peringkat Lengkap Semua Pemain -->
+            <div class="space-y-3">
+                <h4 class="font-bold text-xs uppercase tracking-wider text-amber-400 flex items-center">
+                    <i class="fa-solid fa-trophy mr-1.5 text-yellow-400"></i> Peringkat Pemain Tertinggi
+                </h4>
+                
+                <div class="max-h-[40vh] overflow-y-auto border border-indigo-900/80 rounded-2xl bg-slate-950/50 p-2 space-y-2" id="admin-players-list"></div>
+            </div>
+
+            <div class="flex flex-wrap justify-between items-center pt-2 gap-2 border-t border-indigo-900/60">
+                <button onclick="clearAllData()" class="bg-rose-900/60 hover:bg-rose-800 border border-rose-700 text-rose-200 font-bold py-2 px-4 rounded-xl text-xs transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>Reset Semua Data Game</span>
+                </button>
+                <button onclick="returnToMenu()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold py-2 px-6 rounded-xl text-xs transition shadow">
+                    Kembali ke Menu
+                </button>
+            </div>
+        </div>
+
+        <!-- LAYAR PERMAINAN KUIS (GAMEPLAY) -->
+        <div id="game-screen" class="hidden w-full bg-slate-900/90 border border-indigo-900/80 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+            <div class="flex justify-between items-center border-b border-indigo-900/60 pb-4">
+                <span id="question-category-tag" class="text-xs font-bold uppercase tracking-wider bg-indigo-950 text-amber-400 px-3 py-1 rounded-full border border-indigo-700/50">Kategori</span>
+                <span id="question-progress" class="text-xs text-slate-400 font-medium">Soal 1 dari 5</span>
+            </div>
+
+            <div class="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-indigo-950">
+                <div id="timer-bar" class="bg-amber-400 h-full w-full transition-all duration-1000"></div>
+            </div>
+
+            <div class="space-y-4 text-center">
+                <h3 id="question-title" class="text-lg sm:text-xl font-bold text-amber-200">Pertanyaan akan muncul di sini?</h3>
+                <div id="question-media" class="bg-slate-950/60 border border-indigo-950 rounded-2xl p-6 flex flex-col items-center justify-center min-h-[120px] space-y-2">
+                    <p id="question-desc" class="text-sm text-slate-300 italic">Keterangan atau petunjuk soal...</p>
+                    <div id="explanation-box" class="hidden text-xs bg-indigo-950/80 text-amber-200 border border-indigo-800/60 p-3 rounded-xl mt-2 w-full text-left"></div>
+                </div>
+            </div>
+
+            <div id="options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2"></div>
+        </div>
+
+        <!-- LAYAR MINI GAME: MENCOCOKKAN KARTU SAMBAS (16 KARTU) -->
+        <div id="sambas-game-screen" class="hidden w-full bg-slate-900/90 border border-amber-500/50 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-4 text-center">
+            <div class="flex justify-between items-center border-b border-indigo-900/60 pb-3">
+                <span class="text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 px-3 py-1 rounded-full border border-amber-500/40">Kartu Budaya Sambas (16 Kartu)</span>
+                <span class="text-xs text-amber-300 font-medium">Pasangan Cocok: <span id="sambas-matches">0</span> / 8</span>
+            </div>
+            <p class="text-xs text-slate-300">Temukan 8 pasang kartu budaya ikonik Kabupaten Sambas!</p>
+            
+            <div id="sambas-cards-grid" class="grid grid-cols-4 gap-2.5 py-2"></div>
+            
+            <div>
+                <button onclick="returnToMenu()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-5 rounded-xl text-xs transition shadow">Kembali ke Menu</button>
+            </div>
+        </div>
+
+        <!-- LAYAR ENSIKLOPEDIA & RIWAYAT PRIBADI -->
+        <div id="encyclopedia-screen" class="hidden w-full bg-slate-900/95 border border-indigo-900 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+            <div class="flex justify-between items-center border-b border-indigo-900 pb-4">
+                <h3 class="text-xl font-bold text-amber-300 flex items-center"><i class="fa-solid fa-book-open mr-2"></i> Ensiklopedia & Riwayat: <span id="encyclopedia-user-title" class="text-white ml-1"></span></h3>
+                <button onclick="returnToMenu()" class="text-slate-400 hover:text-white text-sm"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-2 text-sm text-slate-300">
+                <div class="bg-indigo-950/40 border border-indigo-800/60 p-4 rounded-xl space-y-2">
+                    <h4 class="font-bold text-amber-400 text-xs uppercase tracking-wider"><i class="fa-solid fa-clock-rotate-left mr-1"></i> Riwayat Sesi Permainan Kamu</h4>
+                    <div id="user-history-list" class="space-y-2 pt-1"></div>
+                </div>
+
+                <div class="bg-slate-950/60 border border-indigo-950 p-4 rounded-xl space-y-1">
+                    <h4 class="font-bold text-amber-400"><i class="fa-solid fa-clone mr-1"></i> Kain Tenun Insang Sambas</h4>
+                    <p class="text-xs leading-relaxed">Kain tenun tradisional khas Sambas, Kalimantan Barat yang memiliki corak geometris dan warna cerah penuh makna filosofis.</p>
+                </div>
+                <div class="bg-slate-950/60 border border-indigo-950 p-4 rounded-xl space-y-1">
+                    <h4 class="font-bold text-amber-400"><i class="fa-solid fa-landmark mr-1"></i> Istana Alwazzikhoebbillah Sambas</h4>
+                    <p class="text-xs leading-relaxed">Istana Kesultanan Sambas bersejarah yang terletak di tepi sungai Sambas, pusat kebudayaan Melayu.</p>
+                </div>
+            </div>
+            <div class="text-center pt-2">
+                <button onclick="returnToMenu()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-6 rounded-xl text-sm transition shadow">Kembali ke Menu</button>
+            </div>
+        </div>
+
+        <!-- LAYAR LEADERBOARD -->
+        <div id="leaderboard-screen" class="hidden w-full bg-slate-900/95 border border-indigo-900 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+            <div class="flex justify-between items-center border-b border-indigo-900 pb-4">
+                <h3 class="text-xl font-bold text-amber-300 flex items-center"><i class="fa-solid fa-medal mr-2"></i> Papan Peringkat</h3>
+                <button onclick="returnToMenu()" class="text-slate-400 hover:text-white text-sm"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div id="leaderboard-list" class="space-y-2 max-h-[50vh] overflow-y-auto"></div>
+            <div class="text-center pt-2">
+                <button onclick="returnToMenu()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-6 rounded-xl text-sm transition shadow">Kembali ke Menu</button>
+            </div>
+        </div>
+
+        <!-- LAYAR PENCAPAIAN (ACHIEVEMENTS) -->
+        <div id="achievements-screen" class="hidden w-full bg-slate-900/95 border border-indigo-900 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+            <div class="flex justify-between items-center border-b border-indigo-900 pb-4">
+                <h3 class="text-xl font-bold text-amber-300 flex items-center"><i class="fa-solid fa-trophy mr-2"></i> Lencana Pencapaian: <span id="achievements-user-title" class="text-white ml-1"></span></h3>
+                <button onclick="returnToMenu()" class="text-slate-400 hover:text-white text-sm"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div id="achievements-list" class="space-y-3 max-h-[55vh] overflow-y-auto pr-1"></div>
+            <div class="text-center pt-2">
+                <button onclick="returnToMenu()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-6 rounded-xl text-sm transition shadow">Kembali ke Menu</button>
+            </div>
+        </div>
+
+        <!-- LAYAR SELESAI / GAMEOVER -->
+        <div id="result-screen" class="hidden w-full bg-slate-900/95 border border-indigo-900 rounded-3xl p-8 shadow-2xl text-center space-y-6">
+            <div id="result-icon" class="w-20 h-20 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center mx-auto text-3xl border border-amber-500/40">
+                <i class="fa-solid fa-trophy"></i>
+            </div>
+            <div class="space-y-2">
+                <h3 id="result-title" class="text-2xl font-extrabold text-amber-300">Permainan Selesai!</h3>
+                <p id="result-message" class="text-slate-300 text-sm">Kerja bagus! Kamu telah menyelesaikan sesi permainan ini.</p>
+                <div id="badge-container" class="inline-block bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs px-4 py-1.5 rounded-full font-semibold mt-2"></div>
+            </div>
+            <div class="bg-slate-950/60 p-4 rounded-2xl border border-indigo-950 inline-block px-8">
+                <p class="text-xs text-slate-400">Skor Akhir Kamu</p>
+                <p id="final-score" class="text-3xl font-black text-amber-400">100</p>
+            </div>
+
+            <div class="space-y-3 max-w-xs mx-auto">
+                <button onclick="saveScoreAndHistory()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition shadow flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    <span>Simpan Skor & Riwayat Saya</span>
+                </button>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-3 pt-2">
+                <button onclick="returnToMenu()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-5 rounded-xl text-sm transition shadow">
+                    <i class="fa-solid fa-house mr-1"></i> Menu Utama
+                </button>
+                <button onclick="restartCurrentCategory()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 px-5 rounded-xl text-sm transition shadow">
+                    <i class="fa-solid fa-rotate-right mr-1"></i> Main Lagi
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-4 text-center text-xs text-slate-500 border-t border-indigo-950">
+        &copy; 2026 Game Tradisional Nusantara. Dibuat oleh Fifi XII RPL 1.
+    </footer>
+
+    <!-- Logika Javascript Game & Admin -->
+    <script>
+        const ADMIN_PASSWORD = "admin123";
+
+        let audioCtx = null;
+        let isBgmPlaying = false;
+        let isDarkMode = true;
+        let isSpeedRun = false;
+        let speedRunCorrectCount = 0;
+        let isSambasGame = false;
+        let playerName = "";
+
+        let sambasCards = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let canFlip = true;
+
+        // FUNGSI TOGGLE LIHAT / SEMBUNYIKAN PASSWORD ADMIN
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('admin-password-input');
+            const eyeIcon = document.getElementById('eye-icon');
+
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                eyeIcon.className = "fa-solid fa-eye-slash text-amber-400";
+            } else {
+                passwordInput.type = "password";
+                eyeIcon.className = "fa-solid fa-eye text-slate-400";
+            }
+        }
+
+        // FUNGSI UNTUK MENGACAK POSISI OPSI JAWABAN (AGAR TIDAK SELALU DI A)
+        function getShuffledQuestion(q) {
+            let optionsCopy = [...q.options];
+            let correctText = optionsCopy[q.answer]; 
+            
+            optionsCopy.sort(() => Math.random() - 0.5);
+            
+            let newAnswerIdx = optionsCopy.indexOf(correctText);
+
+            return {
+                ...q,
+                options: optionsCopy,
+                answer: newAnswerIdx
+            };
+        }
+
+        function saveNameAndStart() {
+            const input = document.getElementById('initial-player-name').value.trim();
+            const errorMsg = document.getElementById('name-error-msg');
+
+            if (input === "") {
+                errorMsg.classList.remove('hidden');
+                document.getElementById('initial-player-name').classList.add('border-rose-500');
+                return;
+            }
+
+            errorMsg.classList.add('hidden');
+            playerName = input;
+
+            document.getElementById('current-player-name').innerText = playerName;
+            document.getElementById('welcome-player-name').innerText = playerName;
+            document.getElementById('player-display').classList.remove('hidden');
+
+            const modal = document.getElementById('start-modal');
+            if (modal) {
+                modal.style.opacity = '0';
+                setTimeout(() => modal.remove(), 500);
+            }
+        }
+
+        function openAdminLoginModal() {
+            const passwordInput = document.getElementById('admin-password-input');
+            const eyeIcon = document.getElementById('eye-icon');
+            
+            passwordInput.value = "";
+            passwordInput.type = "password";
+            eyeIcon.className = "fa-solid fa-eye text-slate-400";
+            
+            document.getElementById('admin-login-err').classList.add('hidden');
+            document.getElementById('admin-login-modal').classList.remove('hidden');
+        }
+
+        function closeAdminLoginModal() {
+            document.getElementById('admin-login-modal').classList.add('hidden');
+        }
+
+        function verifyAdminPassword() {
+            const pass = document.getElementById('admin-password-input').value;
+            if (pass === ADMIN_PASSWORD) {
+                closeAdminLoginModal();
+                const startModal = document.getElementById('start-modal');
+                if (startModal) startModal.remove();
+                openAdminDashboard();
+            } else {
+                document.getElementById('admin-login-err').classList.remove('hidden');
+            }
+        }
+
+        function openAdminDashboard() {
+            document.getElementById('menu-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('encyclopedia-screen').classList.add('hidden');
+            document.getElementById('leaderboard-screen').classList.add('hidden');
+            document.getElementById('achievements-screen').classList.add('hidden');
+            document.getElementById('admin-dashboard-screen').classList.remove('hidden');
+
+            renderAdminData();
+        }
+
+        function renderAdminData() {
+            let leaderboard = JSON.parse(localStorage.getItem('traditional_game_lb') || '[]');
+            const container = document.getElementById('admin-players-list');
+            
+            document.getElementById('admin-total-players').innerText = leaderboard.length;
+            document.getElementById('admin-top-score').innerText = leaderboard.length > 0 ? leaderboard[0].score : 0;
+
+            if (leaderboard.length === 0) {
+                container.innerHTML = '<p class="text-center text-xs text-slate-400 py-6 italic">Belum ada data pemain yang memainkan game ini.</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            leaderboard.forEach((item, index) => {
+                let badgeColor = index === 0 ? "bg-amber-500 text-slate-950 font-black" : (index === 1 ? "bg-slate-300 text-slate-950 font-bold" : (index === 2 ? "bg-amber-700 text-white font-bold" : "bg-indigo-950 text-amber-300 border border-indigo-800"));
+                
+                const div = document.createElement('div');
+                div.className = "bg-slate-900 border border-indigo-900/80 p-3 rounded-xl flex items-center justify-between text-xs";
+                div.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="w-7 h-7 rounded-lg ${badgeColor} text-xs flex items-center justify-center shadow">
+                            #${index + 1}
+                        </span>
+                        <div>
+                            <p class="font-bold text-amber-200 text-sm">${item.name}</p>
+                            <p class="text-[11px] text-slate-400"><i class="fa-solid fa-gamepad mr-1"></i>${item.category}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="font-black text-emerald-400 text-sm block">+${item.score} Pt</span>
+                        <button onclick="deleteSinglePlayer('${item.name}')" class="text-[10px] text-rose-400 hover:underline">Hapus</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function deleteSinglePlayer(name) {
+            if (confirm(`Yakin ingin menghapus semua data skor milik "${name}"?`)) {
+                let leaderboard = JSON.parse(localStorage.getItem('traditional_game_lb') || '[]');
+                leaderboard = leaderboard.filter(item => item.name !== name);
+                localStorage.setItem('traditional_game_lb', JSON.stringify(leaderboard));
+                localStorage.removeItem(`traditional_game_history_${name}`);
+                localStorage.removeItem(`traditional_game_ach_${name}`);
+                renderAdminData();
+            }
+        }
+
+        function clearAllData() {
+            if (confirm("Apakah Anda yakin ingin MENGHAPUS SEMUA DATA pemain dan peringkat?")) {
+                localStorage.clear();
+                alert("Seluruh data pemain telah dihapus!");
+                renderAdminData();
+            }
+        }
+
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            const root = document.getElementById('html-root');
+            const body = document.getElementById('body-theme');
+            const icon = document.getElementById('theme-icon');
+
+            if (isDarkMode) {
+                root.classList.add('dark');
+                body.className = "bg-batik-dark min-h-screen text-slate-100 flex flex-col justify-between transition-colors duration-300";
+                icon.className = "fa-solid fa-moon";
+            } else {
+                root.classList.remove('dark');
+                body.className = "bg-batik-light min-h-screen text-slate-900 flex flex-col justify-between transition-colors duration-300";
+                icon.className = "fa-solid fa-sun";
+            }
+        }
+
+        function toggleBGM() {
+            const bgmAudio = document.getElementById('bgm-audio');
+            const bgmStatus = document.getElementById('bgm-status');
+            const bgmIcon = document.getElementById('bgm-icon');
+
+            if (!isBgmPlaying) {
+                bgmAudio.play().then(() => {
+                    isBgmPlaying = true;
+                    bgmStatus.innerText = "BGM: ON";
+                    bgmIcon.className = "fa-solid fa-volume-high text-emerald-400";
+                }).catch(err => {
+                    console.log("Audio diblokir oleh browser:", err);
+                });
+            } else {
+                bgmAudio.pause();
+                isBgmPlaying = false;
+                bgmStatus.innerText = "BGM: OFF";
+                bgmIcon.className = "fa-solid fa-music";
+            }
+        }
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            initAudio();
+            if (!audioCtx) return;
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.4);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(100, audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'win') {
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => {
+                    const o = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    o.connect(g);
+                    g.connect(audioCtx.destination);
+                    o.frequency.value = freq;
+                    g.gain.setValueAtTime(0.1, audioCtx.currentTime + idx * 0.1);
+                    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.1 + 0.3);
+                    o.start(audioCtx.currentTime + idx * 0.1);
+                    o.stop(audioCtx.currentTime + idx * 0.1 + 0.3);
+                });
+            }
+        }
+
+        const gameData = {
+            1: [
+                { title: "Alat musik tradisional dari bambu yang dimainkan dengan cara digoyangkan berasal dari Jawa Barat.", desc: "Bunyikannya khas dan mendunia.", options: ["Angklung", "Sasando", "Kolintang", "Gamelan"], answer: 0, explanation: "Angklung diakui UNESCO sebagai Warisan Budaya Takbenda sejak 2010." },
+                { title: "Alat musik petik tradisional asal Pulau Rote, NTT yang dikelilingi daun lontar melingkar.", desc: "Bentuk menyerupai setengah biji semangka berdawai.", options: ["Tifa", "Sasando", "Gamelan", "Sape"], answer: 1, explanation: "Sasando menghasilkan resonansi suara unik dari lembaran daun lontar." },
+                { title: "Alat musik perkusi ansambel tradisional dari Minahasa, Sulawesi Utara terbuat dari kayu lokal.", desc: "Dimainkan dengan dipukul menggunakan dua pemukul.", options: ["Kolintang", "Angklung", "Kendang", "Arumba"], answer: 0, explanation: "Kolintang biasanya dimainkan secara ansambel kelompok." },
+                { title: "Alat musik pukul dari Papua & Maluku berbentuk tabung dengan penutup kulit rusa.", desc: "Digunakan untuk mengiringi tarian perang atau adat.", options: ["Tifa", "Sape", "Gamelan", "Gambus"], answer: 0, explanation: "Tifa diukir indah dengan motif khas masyarakat setempat." },
+                { title: "Alat musik petik khas Suku Dayak di Kalimantan.", desc: "Memiliki ukiran artistik yang khas pada badan kayunya.", options: ["Sape", "Sasando", "Kolintang", "Gambus"], answer: 0, explanation: "Sape dimainkan dalam ritual adat maupun hiburan." }
+            ],
+            2: [
+                { title: "Pakaian adat Bundo Kanduang dengan penutup kepala berbentuk tanduk kerbau khas dari suku...", desc: "Identik dengan kebudayaan Minangkabau.", options: ["Suku Minang", "Suku Batak", "Suku Sunda", "Suku Bugis"], answer: 0, explanation: "Tanduk kerbau melambangkan kekuatan dan kemenangan." },
+                { title: "Pakaian tradisional Suku Dayak di Kalimantan sering dilengkapi hiasan...", desc: "Bulu burung enggang dan manik-manik khas.", options: ["Bulu Burung Enggang", "Blangkon", "Ulos", "Ikat Kepala Songket"], answer: 0, explanation: "Burung Enggang simbol kesucian bagi Suku Dayak." },
+                { title: "Kain tenun tradisional Ulos merupakan identitas kebanggaan dari pakaian adat suku...", desc: "Berasal dari wilayah Sumatera Utara.", options: ["Suku Batak", "Suku Bali", "Suku Madura", "Suku Sasak"], answer: 0, explanation: "Ulos melambangkan ikatan kasih sayang antar keluarga." },
+                { title: "Baju Bodo adalah pakaian adat tradisional wanita yang terkenal dari suku...", desc: "Berasal dari Sulawesi Selatan.", options: ["Suku Bugis / Makassar", "Suku Asmat", "Suku Melayu", "Suku Dani"], answer: 0, explanation: "Baju Bodo terkenal sebagai salah satu busana tertua di dunia." },
+                { title: "Pakaian adat pria Jawa sering dilengkapi penutup kepala bernama...", desc: "Terbuat dari kain batik dengan lipatan khusus.", options: ["Blangkon", "Ulos", "Songkok Recca", "Tengkuluk"], answer: 0, explanation: "Blangkon melambangkan kedewasaan dan wibawa kaum pria Jawa." }
+            ],
+            3: [
+                { title: "Lagu daerah 'Ampar-Ampar Pisang' berasal dari provinsi...", desc: "Pisangku belum masak, masak sebiji di hutung bari-bari...", options: ["Kalimantan Selatan", "Sumatera Barat", "Jawa Tengah", "Papua"], answer: 0, explanation: "Lagu riang ini sering dinyanyikan anak-anak saat bermain." },
+                { title: "Lagu populer 'Yamko Rambe Yamko' berasal dari wilayah...", desc: "Te Be Ku Ron Kibe Kube O Beo Kombe...", options: ["Papua", "Maluku", "Sulawesi Utara", "Nusa Tenggara Barat"], answer: 0, explanation: "Lagu daerah berirama semangat dari Papua." },
+                { title: "Lagu daerah 'Manuk Dadali' dinyanyikan menggunakan bahasa...", desc: "Mencerminkan burung garuda yang gagah perkasa.", options: ["Bahasa Sunda (Jawa Barat)", "Bahasa Jawa", "Bahasa Madura", "Bahasa Betawi"], answer: 0, explanation: "Manuk Dadali diciptakan oleh Sambas Mangundikarta." },
+                { title: "Dari daerah manakah asal lagu tradisional 'Rasa Sayange'?", desc: "Rasa sayang-sayange, hei lihat nona jauh...", options: ["Maluku", "Bali", "Aceh", "Riau"], answer: 0, explanation: "Lagu interaktif bertukar pantun populer di Nusantara." },
+                { title: "Tembang atau lagu daerah 'Suwe Ora Jamu' sangat akrab dinyanyikan masyarakat...", desc: "Suwe ora jamu, jamu godhong ketela...", options: ["Jawa Tengah / Yogyakarta", "Jawa Timur", "Sumatera Utara", "Kalimantan Barat"], answer: 0, explanation: "Lagu dolanan anak berirama riang asal Jawa Tengah." }
+            ],
+            4: [
+                { title: "Rumah adat tradisional masyarakat Minangkabau yang atapnya melengkung menyerupai tanduk kerbau disebut...", desc: "Arsitektur khas Sumatera Barat.", options: ["Rumah Gadang", "Joglo", "Honai", "Tongkonan"], answer: 0, explanation: "Rumah Gadang adalah lambang kebesaran adat Minang." },
+                { title: "Rumah adat tradisional khas Suku Toraja di Sulawesi Selatan yang bentuk atapnya mirip perahu dinamakan...", desc: "Terkenal dengan ukiran kayunya.", options: ["Tongkonan", "Limas", "Badui", "Gedong"], answer: 0, explanation: "Tongkonan adalah pusat kehidupan sosial Suku Toraja." },
+                { title: "Senjata tradisional khas dari daerah Jawa yang terkenal dengan bilah keriting dan nilai mistisnya adalah...", desc: "Pusaka leluhur Nusantara.", options: ["Keris", "Rencong", "Kujang", "Badik"], answer: 0, explanation: "Keris diakui UNESCO sebagai karya agung warisan budaya." },
+                { title: "Senjata tikam tradisional yang menjadi simbol keberanian masyarakat Aceh adalah...", desc: "Bentuknya menyerupai huruf L.", options: ["Rencong", "Mandau", "Parang Salawaku", "Celurit"], answer: 0, explanation: "Rencong adalah lambang pertahanan diri rakyat Aceh." },
+                { title: "Rumah adat berbentuk panggung bundar dengan atap jerami dari Papua untuk melindungi dari hawa dingin adalah...", desc: "Khas pegunungan Jayawijaya.", options: ["Honai", "Gadang", "Lamin", "Balai Batak"], answer: 0, explanation: "Honai dirancang sempit agar tetap hangat di suhu dingin." }
+            ],
+            5: [
+                { title: "Tarian tradisional dari Aceh yang terkenal dengan gerakan tepuk tangan serentak tanpa alat musik adalah...", desc: "Ditarikan oleh penari secara berbaris rapat.", options: ["Tari Saman", "Tari Piring", "Tari Jaipong", "Tari Kecak"], answer: 0, explanation: "Tari Saman diakui UNESCO sebagai Warisan Budaya Takbenda." },
+                { title: "Tarian tradisional Bali yang menceritakan kisah Ramayana dan diiringi paduan suara 'cak-cak' penari pria adalah...", desc: "Tanpa instrumen gamelan konvensional.", options: ["Tari Kecak", "Tari Pendet", "Tari Legong", "Tari Topeng"], answer: 0, explanation: "Tari Kecak diciptakan oleh seniman Bali dan Wayan Limbak." },
+                { title: "Tarian tradisional Minangkabau yang dibawakan dengan gerakan lincah sambil memegang piring di telapak tangan adalah...", desc: "Simbol rasa syukur atas hasil panen.", options: ["Tari Piring", "Tari Serimpi", "Tari Yapong", "Tari Payung"], answer: 0, explanation: "Tari Piring dimainkan dengan gerakan ritmis tanpa menjatuhkan piring." },
+                { title: "Tarian pergaulan tradisional Jawa Barat yang memadukan pencak silat dan ketukan kendang dinamis adalah...", desc: "Dipopulerkan oleh Gugum Gumbira.", options: ["Tari Jaipong", "Tari Merak", "Tari Ketuk Tilu", "Tari Topeng Cirebon"], answer: 0, explanation: "Jaipong terinspirasi dari kesenian rakyat Sunda." },
+                { title: "Tarian tradisional dari Papua yang menggambarkan kegembiraan menyambut tamu agung adalah...", desc: "Biasanya diiringi tifa dan nyanyian semangat.", options: ["Tari Selamat Datang (Yospan)", "Tari Cakalele", "Tari Maengket", "Tari Lenso"], answer: 0, explanation: "Tari Yospan adalah tarian pergauran pemuda Papua." }
+            ],
+            6: [
+                { title: "Makanan tradisional khas Minangkabau yang dinobatkan sebagai salah satu makanan terlezat di dunia adalah...", desc: "Dimasak lama dengan santan dan bumbu rempah.", options: ["Rendang", "Gudeg", "Pempek", "Soto Banjar"], answer: 0, explanation: "Rendang kaya akan rempah dan tahan lama secara alami." },
+                { title: "Makanan tradisional khas Yogyakarta yang terbuat dari nangka muda dimasak manis dengan santan adalah...", desc: "Disajikan bersama sambal krecek dan ayam.", options: ["Gudeg", "Rawon", "Pecel", "Bakpia"], answer: 0, explanation: "Gudeg adalah ikon kuliner istimewa kota Yogyakarta." },
+                { title: "Makanan pokok tradisional masyarakat Papua dan Maluku yang terbuat dari sari pati sagu disebut...", desc: "Disajikan hangat dengan kuah ikan kuning.", options: ["Papeda", "Kue Cucur", "Getuk", "Lontong"], answer: 0, explanation: "Papeda disantap dengan cara digulung." },
+                { title: "Makanan tradisional berbahan dasar ikan dan sagu asal Palembang yang disajikan dengan kuah cuko asam pedas adalah...", desc: "Dilengkapi taburan ebi dan mentimun.", options: ["Pempek", "Batagor", "Siomay", "Mie Celor"], answer: 0, explanation: "Pempek adalah kuliner kebanggaan masyarakat Sumatera Selatan." },
+                { title: "Sup daging berkuah hitam legam khas Jawa Timur yang menggunakan bumbu kluwek adalah...", desc: "Disajikan bersama tauge pendek.", options: ["Rawon", "Soto Madura", "Soto Betawi", "Coto Makassar"], answer: 0, explanation: "Kluwek memberikan warna hitam pekat pada rawon." }
+            ]
+        };
+
+        let currentCat = 1;
+        let currentIndex = 0;
+        let score = 0;
+        let lives = 3;
+        let timerInterval = null;
+        let timeLeft = 15;
+        let activeQuestions = [];
+
+        const categoryNames = {
+            1: "Tebak Alat Musik Tradisional",
+            2: "Tebak Baju Adat & Suku",
+            3: "Tebak Lagu Daerah & Asalnya",
+            4: "Tebak Rumah & Senjata Adat",
+            5: "Tebak Tarian Daerah",
+            6: "Tebak Kuliner Khas Nusantara",
+            7: "Kuis Campuran Nusantara"
+        };
+
+        function startCategory(catId) {
+            initAudio();
+            isSambasGame = false;
+            currentCat = catId;
+            currentIndex = 0;
+            score = 0;
+            lives = 3;
+            isSpeedRun = false;
+
+            if (catId === 7) {
+                activeQuestions = [
+                    ...gameData[1], ...gameData[2], ...gameData[3], 
+                    ...gameData[4], ...gameData[5], ...gameData[6]
+                ].sort(() => Math.random() - 0.5).slice(0, 8);
+            } else {
+                activeQuestions = [...gameData[catId]];
+            }
+
+            document.getElementById('menu-screen').classList.add('hidden');
+            document.getElementById('sambas-game-screen').classList.add('hidden');
+            document.getElementById('encyclopedia-screen').classList.add('hidden');
+            document.getElementById('leaderboard-screen').classList.add('hidden');
+            document.getElementById('achievements-screen').classList.add('hidden');
+            document.getElementById('admin-dashboard-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('game-stats').classList.remove('hidden');
+
+            document.getElementById('question-category-tag').innerText = categoryNames[catId];
+            loadQuestion();
+        }
+
+        function startSambasCardGame() {
+            initAudio();
+            isSambasGame = true;
+            score = 0;
+            matchedPairs = 0;
+            flippedCards = [];
+            canFlip = true;
+
+            document.getElementById('menu-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('admin-dashboard-screen').classList.add('hidden');
+            document.getElementById('sambas-game-screen').classList.remove('hidden');
+            document.getElementById('game-stats').classList.remove('hidden');
+            document.getElementById('stat-lives-wrapper').classList.add('hidden');
+            document.getElementById('stat-score').innerText = score;
+            document.getElementById('sambas-matches').innerText = matchedPairs;
+            document.getElementById('stat-timer').innerText = "∞";
+
+            const cardItems = [
+                { id: 1, name: "Tenun Insang", icon: "fa-clone" },
+                { id: 2, name: "Istana Sambas", icon: "fa-landmark" },
+                { id: 3, name: "Sajadah Sambas", icon: "fa-rug" },
+                { id: 4, name: "Bubbor Pedah", icon: "fa-bowl-food" },
+                { id: 5, name: "Gasing Sambas", icon: "fa-circle-dot" },
+                { id: 6, name: "Sungai Sambas", icon: "fa-water" },
+                { id: 7, name: "Tengkuluk Sambas", icon: "fa-hat-cowboy" },
+                { id: 8, name: "Kerupuk Basah", icon: "fa-fish" }
+            ];
+
+            let deck = [...cardItems, ...cardItems];
+            deck.sort(() => Math.random() - 0.5);
+
+            sambasCards = deck;
+            const grid = document.getElementById('sambas-cards-grid');
+            grid.innerHTML = '';
+
+            deck.forEach((card, index) => {
+                const cardEl = document.createElement('div');
+                cardEl.className = "h-20 sm:h-24 bg-slate-950 border border-indigo-900 rounded-xl cursor-pointer flex items-center justify-center text-amber-400 text-lg font-bold transition transform active:scale-95 shadow-lg select-none";
+                cardEl.dataset.index = index;
+                cardEl.dataset.id = card.id;
+                cardEl.innerHTML = `<i class="fa-solid fa-question text-xl text-slate-600"></i>`;
+                cardEl.onclick = () => flipSambasCard(cardEl, card, index);
+                grid.appendChild(cardEl);
+            });
+        }
+
+        function flipSambasCard(cardEl, card, index) {
+            if (!canFlip || flippedCards.includes(index) || cardEl.classList.contains('matched')) return;
+
+            playSound('correct');
+            cardEl.innerHTML = `<div class="flex flex-col items-center space-y-0.5 p-1"><i class="fa-solid ${card.icon} text-amber-400 text-lg sm:text-xl"></i><span class="text-[9px] text-amber-200 text-center leading-tight">${card.name}</span></div>`;
+            cardEl.className = "h-20 sm:h-24 bg-indigo-950 border border-amber-500 rounded-xl flex items-center justify-center text-amber-400 text-xs font-bold shadow-lg transition";
+
+            flippedCards.push({ index, id: card.id, element: cardEl });
+
+            if (flippedCards.length === 2) {
+                canFlip = false;
+                if (flippedCards[0].id === flippedCards[1].id) {
+                    matchedPairs++;
+                    score += 15;
+                    document.getElementById('sambas-matches').innerText = matchedPairs;
+                    document.getElementById('stat-score').innerText = score;
+                    flippedCards[0].element.classList.add('matched');
+                    flippedCards[1].element.classList.add('matched');
+                    flippedCards = [];
+                    canFlip = true;
+
+                    if (matchedPairs === 8) {
+                        setTimeout(() => {
+                            showResult();
+                        }, 800);
+                    }
+                } else {
+                    setTimeout(() => {
+                        flippedCards[0].element.innerHTML = `<i class="fa-solid fa-question text-xl text-slate-600"></i>`;
+                        flippedCards[0].element.className = "h-20 sm:h-24 bg-slate-950 border border-indigo-900 rounded-xl cursor-pointer flex items-center justify-center text-amber-400 text-lg font-bold shadow-lg";
+                        
+                        flippedCards[1].element.innerHTML = `<i class="fa-solid fa-question text-xl text-slate-600"></i>`;
+                        flippedCards[1].element.className = "h-20 sm:h-24 bg-slate-950 border border-indigo-900 rounded-xl cursor-pointer flex items-center justify-center text-amber-400 text-lg font-bold shadow-lg";
+                        
+                        flippedCards = [];
+                        canFlip = true;
+                    }, 1000);
+                }
+            }
+        }
+
+        function startSpeedRun() {
+            initAudio();
+            isSambasGame = false;
+            currentCat = 7;
+            currentIndex = 0;
+            score = 0;
+            lives = 999;
+            isSpeedRun = true;
+            speedRunCorrectCount = 0;
+
+            activeQuestions = [
+                ...gameData[1], ...gameData[2], ...gameData[3], 
+                ...gameData[4], ...gameData[5], ...gameData[6]
+            ].sort(() => Math.random() - 0.5);
+
+            document.getElementById('menu-screen').classList.add('hidden');
+            document.getElementById('sambas-game-screen').classList.add('hidden');
+            document.getElementById('encyclopedia-screen').classList.add('hidden');
+            document.getElementById('leaderboard-screen').classList.add('hidden');
+            document.getElementById('achievements-screen').classList.add('hidden');
+            document.getElementById('admin-dashboard-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('game-stats').classList.remove('hidden');
+            document.getElementById('stat-lives-wrapper').classList.remove('hidden');
+
+            document.getElementById('question-category-tag').innerText = "Tantangan Speed Run (60s)";
+            loadSpeedRunQuestion();
+        }
+
+        function loadSpeedRunQuestion() {
+            clearInterval(timerInterval);
+            if (currentIndex >= activeQuestions.length) {
+                currentIndex = 0;
+                activeQuestions.sort(() => Math.random() - 0.5);
+            }
+
+            const rawQ = activeQuestions[currentIndex];
+            const q = getShuffledQuestion(rawQ);
+
+            document.getElementById('question-progress').innerText = `Benar: ${speedRunCorrectCount}`;
+            document.getElementById('question-title').innerText = q.title;
+            document.getElementById('question-desc').innerText = q.desc;
+            document.getElementById('explanation-box').classList.add('hidden');
+            document.getElementById('stat-score').innerText = score;
+            document.getElementById('stat-lives').innerText = "∞";
+
+            timeLeft = (currentIndex === 0) ? 60 : 8;
+            document.getElementById('stat-timer').innerText = timeLeft;
+            
+            const timerBar = document.getElementById('timer-bar');
+            timerBar.style.width = '100%';
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('stat-timer').innerText = timeLeft;
+                timerBar.style.width = `${(timeLeft / ((currentIndex === 0)? 60 : 8)) * 100}%`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    showResult();
+                }
+            }, 1000);
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "bg-slate-800 hover:bg-indigo-700/60 border border-indigo-900 hover:border-amber-400/50 p-4 rounded-xl text-left font-medium text-sm transition-all shadow flex items-center space-x-3";
+                btn.innerHTML = `<span class="w-7 h-7 rounded-lg bg-indigo-950 flex items-center justify-center text-xs font-bold text-amber-400 border border-indigo-800">${String.fromCharCode(65 + idx)}</span><span>${opt}</span>`;
+                btn.onclick = () => checkSpeedRunAnswer(idx, q.answer);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkSpeedRunAnswer(selected, correct) {
+            clearInterval(timerInterval);
+            const buttons = document.getElementById('options-container').children;
+            for (let btn of buttons) btn.style.pointerEvents = 'none';
+
+            if (selected === correct) {
+                playSound('correct');
+                buttons[selected].classList.add('bg-emerald-900/80', 'border-emerald-500', 'text-emerald-200');
+                score += 15;
+                speedRunCorrectCount++;
+            } else {
+                playSound('wrong');
+                buttons[selected].classList.add('bg-rose-900/80', 'border-rose-500', 'text-rose-200');
+                buttons[correct].classList.add('bg-emerald-900/80', 'border-emerald-500', 'text-emerald-200');
+            }
+
+            document.getElementById('stat-score').innerText = score;
+
+            setTimeout(() => {
+                currentIndex++;
+                loadSpeedRunQuestion();
+            }, 800);
+        }
+
+        function loadQuestion() {
+            if (isSpeedRun) {
+                loadSpeedRunQuestion();
+                return;
+            }
+
+            clearInterval(timerInterval);
+            if (currentIndex >= activeQuestions.length || lives <= 0) {
+                showResult();
+                return;
+            }
+
+            const rawQ = activeQuestions[currentIndex];
+            const q = getShuffledQuestion(rawQ);
+
+            document.getElementById('question-progress').innerText = `Soal ${currentIndex + 1} dari ${activeQuestions.length}`;
+            document.getElementById('question-title').innerText = q.title;
+            document.getElementById('question-desc').innerText = q.desc;
+            document.getElementById('explanation-box').classList.add('hidden');
+            document.getElementById('stat-score').innerText = score;
+            document.getElementById('stat-lives').innerText = lives;
+
+            timeLeft = 15;
+            document.getElementById('stat-timer').innerText = timeLeft;
+            const timerBar = document.getElementById('timer-bar');
+            timerBar.style.width = '100%';
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('stat-timer').innerText = timeLeft;
+                timerBar.style.width = `${(timeLeft / 15) * 100}%`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    handleTimeout(q.answer);
+                }
+            }, 1000);
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "bg-slate-800 hover:bg-indigo-700/60 border border-indigo-900 hover:border-amber-400/50 p-4 rounded-xl text-left font-medium text-sm transition-all shadow flex items-center space-x-3";
+                btn.innerHTML = `<span class="w-7 h-7 rounded-lg bg-indigo-950 flex items-center justify-center text-xs font-bold text-amber-400 border border-indigo-800">${String.fromCharCode(65 + idx)}</span><span>${opt}</span>`;
+                btn.onclick = () => checkAnswer(idx, q.answer, q.explanation);
+                container.appendChild(btn);
+            });
+        }
+
+        function handleTimeout(correctIdx) {
+            clearInterval(timerInterval);
+            playSound('wrong');
+            lives--;
+            document.getElementById('stat-lives').innerText = lives;
+
+            const buttons = document.getElementById('options-container').children;
+            for (let btn of buttons) btn.style.pointerEvents = 'none';
+
+            buttons[correctIdx].classList.add('bg-emerald-900/80', 'border-emerald-500', 'text-emerald-200');
+
+            setTimeout(() => {
+                currentIndex++;
+                loadQuestion();
+            }, 1800);
+        }
+
+        function checkAnswer(selected, correct, explanation) {
+            clearInterval(timerInterval);
+            const buttons = document.getElementById('options-container').children;
+            for (let btn of buttons) btn.style.pointerEvents = 'none';
+
+            const expBox = document.getElementById('explanation-box');
+            expBox.innerText = `💡 Info: ${explanation}`;
+            expBox.classList.remove('hidden');
+
+            if (selected === correct) {
+                playSound('correct');
+                buttons[selected].classList.add('bg-emerald-900/80', 'border-emerald-500', 'text-emerald-200');
+                score += 20;
+            } else {
+                playSound('wrong');
+                buttons[selected].classList.add('bg-rose-900/80', 'border-rose-500', 'text-rose-200');
+                buttons[correct].classList.add('bg-emerald-900/80', 'border-emerald-500', 'text-emerald-200');
+                lives--;
+            }
+
+            document.getElementById('stat-score').innerText = score;
+            document.getElementById('stat-lives').innerText = lives;
+
+            setTimeout(() => {
+                currentIndex++;
+                loadQuestion();
+            }, 2500);
+        }
+
+        function showResult() {
+            clearInterval(timerInterval);
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('sambas-game-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            document.getElementById('final-score').innerText = score;
+
+            unlockAchievement(score);
+
+            const titleElem = document.getElementById('result-title');
+            const msgElem = document.getElementById('result-message');
+            const iconElem = document.getElementById('result-icon');
+            const badgeElem = document.getElementById('badge-container');
+
+            if (lives <= 0 && !isSpeedRun && !isSambasGame) {
+                titleElem.innerText = "Game Over!";
+                msgElem.innerText = `Nyawa kamu habis, ${playerName}. Coba pelajari Ensiklopedia Budaya terlebih dahulu!`;
+                iconElem.className = "w-20 h-20 bg-rose-500/20 text-rose-400 rounded-full flex items-center justify-center mx-auto text-3xl border border-rose-500/40";
+                iconElem.innerHTML = '<i class="fa-solid fa-face-frown"></i>';
+                badgeElem.innerText = "🏅 Pejuang Budaya Pemula";
+            } else {
+                playSound('win');
+                titleElem.innerText = isSambasGame ? "Kartu Sambas Selesai!" : (isSpeedRun ? "Speed Run Selesai!" : "Luar Biasa!");
+                msgElem.innerText = `Hebat ${playerName}! Kamu berhasil mengumpulkan skor ${score} dalam sesi permainan Nusantara!`;
+                iconElem.className = "w-20 h-20 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center mx-auto text-3xl border border-amber-500/40";
+                iconElem.innerHTML = '<i class="fa-solid fa-crown"></i>';
+                badgeElem.innerText = "👑 Master Budaya Nusantara";
+            }
+        }
+
+        function unlockAchievement(finalScore) {
+            let key = `traditional_game_ach_${playerName}`;
+            let achievements = JSON.parse(localStorage.getItem(key) || '[]');
+            if (finalScore >= 60 && !achievements.includes("Pintar Budaya")) achievements.push("Pintar Budaya");
+            if (finalScore >= 120 && !achievements.includes("Master Nusantara")) achievements.push("Master Nusantara");
+            if (isSambasGame && !achievements.includes("Pencinta Budaya Sambas")) achievements.push("Pencinta Budaya Sambas");
+            localStorage.setItem(key, JSON.stringify(achievements));
+        }
+
+        function openAchievements() {
+            document.getElementById('menu-screen').classList.add('hidden');
+            document.getElementById('admin-dashboard-screen').classList.add('hidden');
+            document.getElementById('achievements-screen').classList.remove('hidden');
+            document.getElementById('achievements-user-title').innerText = playerName;
+
+            const container = document.getElementById('achievements-list');
+            let key = `traditional_game_ach_${playerName}`;
+            let achievements = JSON.parse(localStorage.getItem(key) || '[]');
+
+            const allBadges = [
+                { title: "Pintar Budaya", desc: "Meraih skor minimal 60 poin dalam permainan.", unlocked: achievements.includes("Pintar Budaya") },
+                { title: "Master Nusantara", desc: "Meraih skor tinggi di permainan.", unlocked: achievements.includes("Master Nusantara") },
+                { title: "Pencinta Budaya Sambas", desc: "Menyelesaikan game mencocokkan 16 kartu budaya Sambas.", unlocked: achievements.includes("Pencinta Budaya Sambas") }
+            ];
+
+            container.innerHTML = '';
+            allBadges.forEach(b => {
+                const div = document.createElement('div');
+                div.className = `p-3.5 rounded-xl border flex items-center space-x-3 text-sm ${b.unlocked ? 'bg-amber-500/10 border-amber-500/40 text-amber-200' : 'bg-slate-950/60 border-indigo-950 text-slate-500'}`;
+                div.innerHTML = `<div class="text-xl ${b.unlocked ? 'text-amber-400' : 'text-slate-600'}"><i class="fa-solid fa-award"></i></div><div><p class="font-bold">${b.title} ${b.unlocked ? '✅' : '🔒'}</p><p class="text-xs text-slate-400">${b.desc}</p></div>`;
+                container.appendChild(div);
+            });
+        }
+
+        function saveScoreAndHistory() {
+            let modeName = isSambasGame ? "Kartu Sambas (16 Kartu)" : (isSpeedRun ? "Speed Run" : categoryNames[currentCat]);
+            
+            let historyKey = `traditional_game_history_${playerName}`;
+            let userHistory = JSON.parse(localStorage.getItem(historyKey) || '[]');
+            userHistory.unshift({ mode: modeName, score: score, date: new Date().toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' }) });
+            localStorage.setItem(historyKey, JSON.stringify(userHistory));
+
+            let leaderboard = JSON.parse(localStorage.getItem('traditional_game_lb') || '[]');
+            leaderboard.push({ name: playerName, score: score, category: modeName });
+            leaderboard.sort((a, b) => b.score - a.score);
+            localStorage.setItem('traditional_game_lb', JSON.stringify(leaderboard));
+            
+            alert(`Skor & Riwayat berhasil disimpan untuk pengguna: ${playerName}!`);
+            openEncyclopedia();
+        }
+
+        function openEncyclopedia() {
+            document.getElementById('menu-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('admin-dashboard-screen').classList.add('hidden');
+            document.getElementById('encyclopedia-screen').classList.remove('hidden');
+            document.getElementById('encyclopedia-user-title').innerText = playerName;
+
+            const historyContainer = document.getElementById('user-history-list');
+            let historyKey = `traditional_game_history_${playerName}`;
+            let userHistory = JSON.parse(localStorage.getItem(historyKey) || '[]');
+
+            if (userHistory.length === 0) {
+                historyContainer.innerHTML = '<p class="text-xs text-slate-400 italic">Belum ada riwayat permainan untuk nama ini. Mainkan sekarang!</p>';
+                return;
+            }
+
+            historyContainer.innerHTML = '';
+            userHistory.forEach((item) => {
+                const div = document.createElement('div');
+                div.className = "bg-slate-950/80 border border-indigo-900 p-2.5 rounded-lg flex justify-between items-center text-xs";
+                div.innerHTML = `<div><span class="font-bold text-amber-300">${item.mode}</span><span class="text-slate-500 ml-2">(${item.date})</span></div><span class="font-black text-emerald-400">+${item.score} Pt</span>`;
+                historyContainer.appendChild(div);
+            });
+        }
+
+        function openLeaderboard() {
+            document.getElementById('menu-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('admin-dashboard-screen').classList.add('hidden');
+            document.getElementById('leaderboard-screen').classList.remove('hidden');
+
+            const listContainer = document.getElementById('leaderboard-list');
+            let leaderboard = JSON.parse(localStorage.getItem('traditional_game_lb') || '[]');
+            
+            if (leaderboard.length === 0) {
+                listContainer.innerHTML = '<p class="text-center text-xs text-slate-400 py-4">Belum ada skor tersimpan.</p>';
+                return;
+            }
+
+            listContainer.innerHTML = '';
+            leaderboard.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = "bg-slate-950/60 border border-indigo-950 p-3 rounded-xl flex justify-between items-center text-sm";
+                div.innerHTML = `<div class="flex items-center space-x-3"><span class="w-6 h-6 rounded-full bg-indigo-900 text-amber-400 text-xs font-bold flex items-center justify-center">${index + 1}</span><div><p class="font-bold text-amber-200">${item.name}</p><p class="text-xs text-slate-400">${item.category}</p></div></div><span class="font-black text-amber-400">${item.score} Pt</span>`;
+                listContainer.appendChild(div);
+            });
+        }
+
+        function returnToMenu() {
+            clearInterval(timerInterval);
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('sambas-game-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('encyclopedia-screen').classList.add('hidden');
+            document.getElementById('leaderboard-screen').classList.add('hidden');
+            document.getElementById('achievements-screen').classList.add('hidden');
+            document.getElementById('admin-dashboard-screen').classList.add('hidden');
+            document.getElementById('game-stats').classList.add('hidden');
+            document.getElementById('menu-screen').classList.remove('hidden');
+        }
+
+        function restartCurrentCategory() {
+            if (isSambasGame) {
+                startSambasCardGame();
+            } else if (isSpeedRun) {
+                startSpeedRun();
+            } else {
+                startCategory(currentCat);
+            }
+        }
+    </script>
+</body>
+</html>
