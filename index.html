@@ -77,7 +77,7 @@
         </div>
     </div>
 
-    <!-- MODAL LOGIN ADMIN DENGAN FITUR MATA PASSWORD -->
+    <!-- MODAL LOGIN ADMIN -->
     <div id="admin-login-modal" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-amber-500/50 p-6 rounded-3xl max-w-xs w-full text-center space-y-4 shadow-2xl">
             <div class="w-12 h-12 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center mx-auto text-xl border border-amber-500/40">
@@ -426,6 +426,24 @@
                 passwordInput.type = "password";
                 eyeIcon.className = "fa-solid fa-eye text-slate-400";
             }
+        }
+
+        // FUNGSI UNTUK MENGACAK POSISI OPSI JAWABAN (AGAR TIDAK SELALU DI A)
+        function getShuffledQuestion(q) {
+            let optionsCopy = [...q.options];
+            let correctText = optionsCopy[q.answer]; // Ambil teks jawaban benar asli
+            
+            // Acak posisi opsi jawaban
+            optionsCopy.sort(() => Math.random() - 0.5);
+            
+            // Temukan indeks baru dari jawaban benar setelah diacak
+            let newAnswerIdx = optionsCopy.indexOf(correctText);
+
+            return {
+                ...q,
+                options: optionsCopy,
+                answer: newAnswerIdx
+            };
         }
 
         function saveNameAndStart() {
@@ -856,7 +874,9 @@
                 activeQuestions.sort(() => Math.random() - 0.5);
             }
 
-            const q = activeQuestions[currentIndex];
+            const rawQ = activeQuestions[currentIndex];
+            const q = getShuffledQuestion(rawQ); // Opsi diacak posisinya
+
             document.getElementById('question-progress').innerText = `Benar: ${speedRunCorrectCount}`;
             document.getElementById('question-title').innerText = q.title;
             document.getElementById('question-desc').innerText = q.desc;
@@ -929,7 +949,9 @@
                 return;
             }
 
-            const q = activeQuestions[currentIndex];
+            const rawQ = activeQuestions[currentIndex];
+            const q = getShuffledQuestion(rawQ); // Opsi diacak posisinya
+
             document.getElementById('question-progress').innerText = `Soal ${currentIndex + 1} dari ${activeQuestions.length}`;
             document.getElementById('question-title').innerText = q.title;
             document.getElementById('question-desc').innerText = q.desc;
